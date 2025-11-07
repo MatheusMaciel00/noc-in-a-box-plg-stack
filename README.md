@@ -138,5 +138,18 @@ Quando o Nginx "morre", o `nginx-exporter` reporta `nginx_up = 0`, e o Grafana d
 Um projeto só está completo quando se depura os problemas. Esta stack apresentou vários desafios do mundo real que foram cruciais para o aprendizado:
 
 #### O "Bug" `up` vs. `nginx_up` (Lógica de Alerta):
-* **Problema:** O meu primeiro alerta (usando `up{job="nginx"}`) não disparou quando "matei" o content
+* **Problema:** O meu primeiro alerta (usando `up{job="nginx"}`) não disparou quando "matei" o contentor `web`.
+* **Análise:** Descobri que `up` monitoriza o tradutor (`nginx-exporter`), que continuava a rodar. A métrica correta era `nginx_up`, que é o que o tradutor reporta sobre o serviço Nginx.
+* **Lição:** A métrica que você alerta é mais importante do que o alerta em si. É preciso monitorizar a causa-raiz correta, não um sintoma.
 
+#### O "Bug" `database is locked` (Volumes Corrompidos):
+* **Problema:** O Grafana não arrancava (`ERR_SOCKET_NOT_CONNECTED`). Os logs (`docker compose logs grafana`) mostravam `database is locked`.
+* **Análise:** Múltiplas tentativas de arranque falhadas (devido a outros "bugs" de configuração) corromperam o ficheiro de base de dados SQLite do Grafana, que vive num volume Docker.
+* **Lição:** Os contentores são descartáveis, mas os volumes são persistentes. Para "resetar" um serviço, por vezes é preciso destruir não só o contentor (`docker compose down`), mas também o seu volume (`docker volume rm ..._grafana-data`).
+
+#### O "Bug" `not a directory` (Ficheiros Não Salvos & Caminhos):
+* **Problema:** Contentores como o `promtail` e `grafana` falhavam ao arrancar com um erro `not a directory` (não é um diretório).
+* **Análise:** O `docker-compose.yml` tentava montar um ficheiro (ex: `./grafana/datasource.yml`) que não existia no host (PC). Isto aconteceu devido a ficheiros não salvos no editor de código (o "Bug do Ponto Branco" no VS Code) e nomes de ficheiros/pastas com maiúsculas/minúsculas erradas.
+* **Lição:** O Docker é literal. A sua configuração de infraestrutura como código (IaC) tem de espelhar exatamente a estrutura de ficheiros no disco, e você tem de salvar os seus ficheiros.
+
+Este projeto foi uma lição profunda de como os componentes de observabilidade interagem e, mais importante, como os depurar metodicamente quando falham.
