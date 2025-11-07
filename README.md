@@ -85,3 +85,25 @@ graph TD
     %% Interação do Utilizador
     USER -- Acede ao Dashboard --> GRA
     GRA -- Alertas (FIRING) --> USER
+Componentes da Stack
+Aplicações Alvo:
+
+web-server (Nginx): Simula o frontend da nossa aplicação.
+
+db-server (MariaDB): Simula o backend da nossa aplicação.
+
+Agentes Coletores:
+
+nginx-exporter: Um "tradutor" que lê a página /stub_status do Nginx e a expõe como métricas /metrics que o Prometheus entende (ex: nginx_up).
+
+promtail: O agente da Loki. Ele "ouve" o docker.sock, descobre todos os contentores com a label logging=true, e "empurra" os seus logs para o Loki.
+
+Cérebros (Backends):
+
+prometheus: O nosso banco de dados de séries temporais (TSDB). Ele "raspa" (coleta) ativamente métricas do nginx-exporter e de si mesmo.
+
+loki: O nosso cérebro de agregação de logs. Recebe logs do Promtail e indexa apenas as labels (ex: {job="web"}), tornando-o leve e rápido.
+
+Visualização (Frontend):
+
+grafana: O nosso "painel de vidro único". Foi auto-provisionado no arranque para já "conhecer" o Prometheus e o Loki como fontes de dados. É aqui que construímos dashboards e configuramos alertas.
