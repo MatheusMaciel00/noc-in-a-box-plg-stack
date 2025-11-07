@@ -84,13 +84,8 @@ graph TD
 
     %% Interação do Utilizador
     USER -- Acede ao Dashboard --> GRA
-    GRA -- Alertas (FIRING) --> USER 
-
-
-
-
-
-
+    GRA -- Alertas (FIRING) --> USER
+```
 Componentes da Stack
 Aplicações Alvo:
 
@@ -113,3 +108,4 @@ loki: O nosso cérebro de agregação de logs. Recebe logs do Promtail e indexa 
 Visualização (Frontend):
 
 grafana: O nosso "painel de vidro único". Foi auto-provisionado no arranque para já "conhecer" o Prometheus e o Loki como fontes de dados. É aqui que construímos dashboards e configuramos alertas.
+
