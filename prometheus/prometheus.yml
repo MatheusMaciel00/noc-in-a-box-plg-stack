@@ -1,0 +1,28 @@
+# prometheus.yml
+
+# 'global' define configurações que se aplicam a tudo.
+global:
+  # A cada quanto tempo o Prometheus deve "raspar" (coletar) os alvos.
+  scrape_interval: 15s # A cada 15 segundos
+  # A cada quanto tempo re-avaliar as regras de alerta (veremos na Fase 7).
+  evaluation_interval: 15s
+
+# 'scrape_configs' é a parte principal. É a lista de "trabalhos" (jobs).
+scrape_configs:
+  # --- TRABALHO 1: Monitorar o próprio Prometheus ---
+  - job_name: "prometheus"
+    static_configs:
+      # 'localhost:9090' funciona porque estamos acessando o Prometheus
+      # de dentro dele mesmo.
+      - targets: ["localhost:9090"]
+
+  # --- TRABALHO 2: Monitorar o Nginx ---
+  - job_name: "nginx"
+    static_configs:
+      # Este é o "endereço" do nosso tradutor.
+      # Usamos 'nginx-exporter:9113' porque:
+      # - 'nginx-exporter' é o nome do serviço no docker-compose.
+      # - '9113' é a porta padrão que este exporter usa.
+      # Graças à nossa rede 'monitor-net', o Prometheus sabe como
+      # encontrar 'nginx-exporter'!
+      - targets: ["nginx-exporter:9113"]

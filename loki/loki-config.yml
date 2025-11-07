@@ -1,0 +1,34 @@
+# loki/loki-config.yml
+
+# Configuração de autenticação (desligada, pois é local)
+auth_enabled: false
+
+# Configuração do servidor
+server:
+  http_listen_port: 3100 # Porta onde o Loki escuta
+  grpc_listen_port: 9096
+
+# Configuração de como os "chunks" (pedaços de log) são armazenados
+common:
+  path_prefix: /loki # Diretório base dentro do container
+  storage:
+    filesystem: # Vamos armazenar os logs no sistema de arquivos
+      chunks_directory: /loki/chunks
+      rules_directory: /loki/rules
+  replication_factor: 1 # Sem replicação, é um demo
+  ring:
+    instance_addr: 127.0.0.1
+    kvstore:
+      store: inmemory # Perfeito para demo leve
+
+# Define o que o Loki deve guardar e por quanto tempo
+# (Não é necessário para um demo simples, mas é bom saber)
+schema_config:
+  configs:
+    - from: 2020-10-24
+      store: boltdb-shipper
+      object_store: filesystem
+      schema: v11
+      index:
+        prefix: index_
+        period: 24h

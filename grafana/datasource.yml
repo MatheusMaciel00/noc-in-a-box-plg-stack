@@ -1,0 +1,26 @@
+# grafana/datasource.yml
+
+# "apiVersion: 1" é obrigatório
+apiVersion: 1
+
+# "datasources" é a lista das nossas fontes de dados
+datasources:
+  # --- Fonte de Dados 1: Prometheus ---
+  - name: Prometheus
+    type: prometheus
+    access: proxy # O Grafana acede por trás (back-end)
+    url: http://prometheus:9090 # O endereço do nosso Prometheus!
+    isDefault: true # Torná-lo o padrão para métricas
+    jsonData:
+      httpMethod: POST
+    editable: false # Não permitir que seja editado pela UI
+
+  # --- Fonte de Dados 2: Loki ---
+  - name: Loki
+    type: loki
+    access: proxy
+    url: http://loki:3100 # O endereço do nosso Loki!
+    isDefault: false # Não é o padrão (Prometheus é)
+    jsonData:
+      httpMethod: GET
+    editable: false
